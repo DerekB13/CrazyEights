@@ -1,54 +1,50 @@
 import java.util.ArrayList;
 
-public class AI {
+public final class AI {
 	private ArrayList<Card> hand;
+	private ArrayList<Card> playedCards;
+	private Card first;
+	private boolean played;
 	
 	//constructor sets hand to point to the ArrayList<Card> in the Game class
 	public AI(){
 		hand = Game.getCompHand();
+		playedCards = new ArrayList<Card>();
+		played = false;
 	}
 	
-	//Algorithm for the ai to take it's turn
+	//Algorithm for the ai to take its turn
 	public boolean takeTurn(){
-		String most;
-		boolean canPlay = false, played = false;
-		String e = "Clubs";//crazyEights.getEightSuit();
+		String most, mostSuit = null;
+		boolean canPlay = false;
+		played = false;
+		String e = crazyEights.getEightSuit();
 		
 		while(!played){//loops until the computer plays a card.
 			most = findMostValue();
 
 			if(e != null){ //this if checks whether the last card that was played is an eight. 
-				System.out.println("a");
 				if(hasSuit(e) || hasEight()) //checks whether the computer has any cards that it can play.
 					canPlay = true;
 				
 				if(canPlay){
 					if(hasCard(most + " " + e)){ //checks if the computer can play its biggest set of same-valued cards. If it can, it plays them. 
-						System.out.println("b");
-						Game.getDeck().discard(hand.get(findCard(most + " " + e)));
-						hand.remove(hand.get(findCard(most + " " + e)));
-						played = true;
+						playCard(findCard(most + " " + e));
 						
 						//checks whether the computer has any more same-valued cards to play.
 						playMultiples(most);
 						
 					}else if(hasSuit(e)){ //tries to play a card with the suit that the player changed it to.
-						System.out.println("c");
-						Game.getDeck().discard(hand.get(findSuit(e)));
-						hand.remove(hand.get(findSuit(e)));
-						played = true;
+						playCard(findSuit(e));
 						
 						//checks whether the computer has any more same-valued cards to play.
 						playMultiples(getTopCard().getValue().toString());
 						
 					}else{ //plays an eight and then changes the suit to whichever suit the computer has the most of.
-						System.out.println("d");
-						Game.getDeck().discard(hand.get(findValue("8")));
-						hand.remove(hand.get(findValue("8")));
-						played = true;
-						String mostSuit = findMostSuit();
+						playCard(findEight());
+						
+						mostSuit = findMostSuit();
 						crazyEights.eightSuit = mostSuit;
-						System.out.println("The Computer changes the suit to " + mostSuit + ".");
 					}
 				}else{ //draws a card.
 					Game.drawToComputer();
@@ -62,40 +58,28 @@ public class AI {
 				
 				if(canPlay){
 					if(hasCard(most + " " + getTopCard().getSuit())){ //checks if the computer can play its biggest set of same-valued cards. If it can, it plays them. 
-						System.out.println("e");
-						Game.getDeck().discard(hand.get(findCard(most + " " + getTopCard().getSuit())));
-						hand.remove(hand.get(findCard(most + " " + getTopCard().getSuit())));
-						played = true;
+						playCard(findCard(most + " " + getTopCard().getSuit()));
 						
 						//checks whether the computer has any more same-valued cards to play.
 						playMultiples(most);
 						
 					}else if(hasValue(getTopCard().getValue().toString())){ //tries to play a card with the value of the top card.
-						System.out.println("f");
-						Game.getDeck().discard(hand.get(findValue(getTopCard().getValue().toString())));
-						hand.remove(hand.get(findValue(getTopCard().getValue().toString())));
-						played = true;
+						playCard(findValue(getTopCard().getValue().toString()));
 						
 						//checks whether the computer has any more same-valued cards to play.
 						playMultiples(getTopCard().getValue().toString());
 						
 					}else if(hasSuit(getTopCard().getSuit().toString())){ //tries to play a card with the suit of the top card.
-						System.out.println("g");
-						Game.getDeck().discard(hand.get(findSuit(getTopCard().getSuit().toString())));
-						hand.remove(hand.get(findSuit(getTopCard().getSuit().toString())));
-						played = true;
+						playCard(findSuit(getTopCard().getSuit().toString()));
 						
 						//checks whether the computer has any more same-valued cards to play.
 						playMultiples(getTopCard().getValue().toString());
 						
 					}else{ //plays an eight and then changes the suit to whichever suit the computer has the most of.
-						System.out.println("h");
-						Game.getDeck().discard(hand.get(findValue("8")));
-						hand.remove(hand.get(findValue("8")));
-						played = true;
-						String mostSuit = findMostSuit();
+						playCard(findEight());
+						
+						mostSuit = findMostSuit();
 						crazyEights.eightSuit = mostSuit;
-						System.out.println("The Computer changes the suit to " + mostSuit + ".");
 					}
 				}else{ //draws a card.
 					Game.drawToComputer();
@@ -103,12 +87,29 @@ public class AI {
 				}
 			}
 		}
-		System.out.println("The Computer played the " + getTopCard() + ".");
+		System.out.print("The Computer played the " + first);
+		
+		int i = 0;
+		for(Card a: playedCards){
+			if(++i == playedCards.size())
+				System.out.print(" , and the " + a);
+			else
+				System.out.print(" , the " + a);
+			
+		}
+		
+		System.out.println(".");
+		
+		if(getTopCard().getValue().equals("8")){
+			System.out.println("The Computer changes the suit to " + mostSuit + ".");
+		}
+		first = null;
+		playedCards.clear();
 		return hand.isEmpty();
 	}
 	
 	//returns the cardValue that the Computer has the most of in String form. If there is a tie, returns the cardValue of the first occuring largest set.
-	public String findMostValue(){
+	private String findMostValue(){
 		int iHigh = 0;
 		int iCurr = 0;
 		String sHigh = null;
@@ -129,7 +130,7 @@ public class AI {
 	}
 	
 	//finds and then returns the name of the suit that the computer has the most of.
-	public String findMostSuit(){
+	private String findMostSuit(){
 		int c = 0, s = 0, d = 0, h = 0, largest;
 		for(Card card: hand){ //loops through hand counting how many of each suit there are.
 			if(card.getSuit().equals("Clubs"))
@@ -154,21 +155,30 @@ public class AI {
 			return "Hearts";
 	}
 	
+	//plays the card at the passed in position
+	private void playCard(int i){
+		Game.getDeck().discard(hand.get(i));
+		first = getTopCard();
+		hand.remove(hand.get(i));
+		played = true;
+	}
+	
 	//takes in a String and plays all of the cards of value "s"
-	public void playMultiples(String s){
+	private void playMultiples(String s){
 		while(hasValue(s)){
 			Game.getDeck().discard(hand.get(findValue(s)));
+			playedCards.add(hand.get(findValue(s)));
 			hand.remove(hand.get(findValue(s)));
 		}
 	}
 	
 	//retrieves and returns the top card of the discard pile
-	public Card getTopCard(){
+	private Card getTopCard(){
 		return Game.getDeck().getTopUsed();
 	}
 	
 	//returns true if the cpu's hand contains an eight
-	public boolean hasEight(){
+	private boolean hasEight(){
 		for(Card c: hand){
 			if(c.getValue().equals("8"))
 				return true;
@@ -177,25 +187,25 @@ public class AI {
 	}
 	
 	//returns true if the cpu's hand contains a card with a suit matching the inputted String
-	public boolean hasSuit(String s){
+	private boolean hasSuit(String s){
 		for(Card c: hand){
-			if(c.getSuit().equals(s))
+			if(c.getSuit().equals(s) && !c.getValue().equals("8"))
 				return true;
 		}
 		return false;
 	}
 	
 	//returns true if the cpu's hand contains a card with a value matching the inputted String
-	public boolean hasValue(String s){
+	private boolean hasValue(String s){
 		for(Card c: hand){
-			if(c.getValue().equals(s))
+			if(c.getValue().equals(s) && !c.getValue().equals("8"))
 				return true;
 		}
 		return false;
 	}
 	
 	//returns true if the cpu's hand contains a card that makes the following statement true: (c.toString().equals(s))
-	public boolean hasCard(String s){
+	private boolean hasCard(String s){
 		for(Card c: hand){
 			if(c.equals(s))
 				return true;
@@ -203,26 +213,35 @@ public class AI {
 		return false;
 	}
 	
-	//loops through the cpu's hand and returns the first index of a card whose suit matches the inputted String
-	public int findSuit(String s){
+	//loops through the cpu's hand and returns the first index of a card whose value is "8"
+	private int findEight(){
 		for(Card c: hand){
-			if(c.getSuit().equals(s))
+			if(c.getValue().equals("8"))
+				return hand.indexOf(c);
+		}
+		return -1;
+	}
+	
+	//loops through the cpu's hand and returns the first index of a card whose suit matches the inputted String
+	private int findSuit(String s){
+		for(Card c: hand){
+			if(c.getSuit().equals(s) && !c.getValue().equals("8"))
 				return hand.indexOf(c);
 		}
 		return -1;
 	}
 	
 	//loops through the cpu's hand and returns the first index of a card whose value matches the inputted String
-	public int findValue(String s){
+	private int findValue(String s){
 		for(Card c: hand){
-			if(c.getValue().equals(s))
+			if(c.getValue().equals(s) && !c.getValue().equals("8"))
 				return hand.indexOf(c);
 		}
 		return -1;
 	}
 	
 	//loops through the cpu's hand and returns the first index of the card that makes the following statement true: (c.toString().equals(s))
-	public int findCard(String s){
+	private int findCard(String s){
 		for(Card c: hand){
 			if(c.equals(s))
 				return hand.indexOf(c);
