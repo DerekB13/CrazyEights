@@ -41,7 +41,7 @@ public class MainMenu
 				{
 					// a player's turn
 					try{
-						if(game.play())
+						if(!game.play())
 							game.ai.takeTurn(); // ai's turn
 					}catch(Exception e){
 						quit = true;
