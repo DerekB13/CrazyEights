@@ -48,7 +48,11 @@ public class Deck {
 	}
 	
 	public void putFirstCard(){
+		while(Origincards.get(0).getValue().equals("8"))
+			shuffle();
+		
 	    Used.add(DrawValueofCard());
+		topUsed = Used.get(0);
 	}
 	
 	public ArrayList<Card> getOrigincards() {
