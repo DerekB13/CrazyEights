@@ -5,7 +5,7 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.stage.Stage;
 
-public class MainMenu2 extends Application{
+public class GameGUI extends Application{
 	public static Stage STAGE;
 	public static MenuScene MENU;
 	public static RulesScene RULES;
