@@ -35,7 +35,7 @@ public class crazyEights extends Game{
     public boolean play() throws java.lang.Exception{
     	boolean hasPlayed = false;
         while(!hasPlayed){
-            System.out.println("Select a card to play, or type draw to draw the card.\nYour current hand contains " + super.getHand());
+            System.out.println("Select a card to play, type \"draw\" to draw the card, or type \"quit\" to quit.\nYour current hand contains " + super.getHand());
             if(eightSuit != null){
             	System.out.println("The top card on the discard pile is the " + super.getTop().getValue() + " but the suit has been changed to " + eightSuit);
             }else
