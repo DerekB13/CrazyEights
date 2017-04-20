@@ -3,6 +3,7 @@ import java.util.ArrayList;
 public class AI {
 	private ArrayList<Card> hand;
 	
+	//constructor sets hand to point to the ArrayList<Card> in the Game class
 	public AI(){
 		hand = Game.getCompHand();
 	}
@@ -106,30 +107,31 @@ public class AI {
 		return hand.isEmpty();
 	}
 	
+	//returns the cardValue that the Computer has the most of in String form. If there is a tie, returns the cardValue of the first occuring largest set.
 	public String findMostValue(){
-		int i = 0;
-		int j = 0;
-		String k = null;
-		String m = null;
-		for(Card c: hand){
-			m = "" + c.getValue();
-			j = 0;
+		int iHigh = 0;
+		int iCurr = 0;
+		String sHigh = null;
+		String sCurr = null;
+		for(Card c: hand){//loops through hand, comparing each card to the others in the hand. It counts how many of a value there are
+			sCurr = "" + c.getValue();
+			iCurr = 0;
 			for(Card d: hand){
 				if(c.getValue() == d.getValue())
-					j++;
+					iCurr++;
 			}
-			if(j > i){
-				i = j;
-				k = m;
+			if(iCurr > iHigh){ //if the current card has more occurrences than the current highest, the current card replaces the highest
+				iHigh = iCurr;
+				sHigh = sCurr;
 			}
 		}
-		return k;
+		return sHigh;
 	}
 	
 	//finds and then returns the name of the suit that the computer has the most of.
 	public String findMostSuit(){
 		int c = 0, s = 0, d = 0, h = 0, largest;
-		for(Card card: hand){
+		for(Card card: hand){ //loops through hand counting how many of each suit there are.
 			if(card.getSuit().equals("Clubs"))
 				c++;
 			else if(card.getSuit().equals("Spades"))
@@ -139,8 +141,9 @@ public class AI {
 			else if(card.getSuit().equals("Hearts"))
 				h++;
 		}
-		largest = Math.max(Math.max(c, s), Math.max(d, h));
+		largest = Math.max(Math.max(c, s), Math.max(d, h)); //finds the suit with the most occurrences
 		
+		//returns the String related to the most occurring suit
 		if(c == largest)
 			return "Clubs";
 		else if(s == largest)
@@ -151,6 +154,7 @@ public class AI {
 			return "Hearts";
 	}
 	
+	//takes in a String and plays all of the cards of value "s"
 	public void playMultiples(String s){
 		while(hasValue(s)){
 			Game.getDeck().discard(hand.get(findValue(s)));
@@ -158,6 +162,7 @@ public class AI {
 		}
 	}
 	
+	//retrieves and returns the top card of the discard pile
 	public Card getTopCard(){
 		return Game.getDeck().getTopUsed();
 	}
@@ -171,6 +176,7 @@ public class AI {
 		return false;
 	}
 	
+	//returns true if the cpu's hand contains a card with a suit matching the inputted String
 	public boolean hasSuit(String s){
 		for(Card c: hand){
 			if(c.getSuit().equals(s))
@@ -179,6 +185,7 @@ public class AI {
 		return false;
 	}
 	
+	//returns true if the cpu's hand contains a card with a value matching the inputted String
 	public boolean hasValue(String s){
 		for(Card c: hand){
 			if(c.getValue().equals(s))
@@ -187,6 +194,7 @@ public class AI {
 		return false;
 	}
 	
+	//returns true if the cpu's hand contains a card that makes the following statement true: (c.toString().equals(s))
 	public boolean hasCard(String s){
 		for(Card c: hand){
 			if(c.equals(s))
@@ -195,6 +203,7 @@ public class AI {
 		return false;
 	}
 	
+	//loops through the cpu's hand and returns the first index of a card whose suit matches the inputted String
 	public int findSuit(String s){
 		for(Card c: hand){
 			if(c.getSuit().equals(s))
@@ -203,6 +212,7 @@ public class AI {
 		return -1;
 	}
 	
+	//loops through the cpu's hand and returns the first index of a card whose value matches the inputted String
 	public int findValue(String s){
 		for(Card c: hand){
 			if(c.getValue().equals(s))
@@ -211,6 +221,7 @@ public class AI {
 		return -1;
 	}
 	
+	//loops through the cpu's hand and returns the first index of the card that makes the following statement true: (c.toString().equals(s))
 	public int findCard(String s){
 		for(Card c: hand){
 			if(c.equals(s))
