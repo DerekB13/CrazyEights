@@ -1,6 +1,8 @@
+package crazyeights.mainapp;
 import java.util.ArrayList;
 import java.util.Scanner;
 public class crazyEights extends Game{
+	private static final Exception Exception = null;
 	private Scanner kb;
 	public AI ai = new AI();
 	public static String eightSuit = null;
@@ -30,7 +32,7 @@ public class crazyEights extends Game{
     	}
     }
 
-    public boolean play(){
+    public boolean play() throws java.lang.Exception{
     	boolean hasPlayed = false;
         while(!hasPlayed){
             System.out.println("Select a card to play, or type draw to draw the card.\nYour current hand contains " + super.getHand());
@@ -39,6 +41,8 @@ public class crazyEights extends Game{
             }else
             	System.out.println("The top card on the discard pile is " + super.getTop());
             String s = kb.nextLine().trim();
+            if(s.equalsIgnoreCase("quit"))
+            	throw Exception;
             if(s.equalsIgnoreCase("draw")){
                 super.drawToPlayer();
                 System.out.println("You drew " + playerHand.get(playerHand.size()-1));
