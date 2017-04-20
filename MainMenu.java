@@ -36,6 +36,7 @@ public class MainMenu
 				crazyEights game = new crazyEights();
 				game.getDeck().putFirstCard();
 				game.getDeck().setTopUsed(game.getDeck().getOrigincards().get(0));
+				quit = false;
 				
 				while (!game.winner() && !quit)
 				{
@@ -47,25 +48,22 @@ public class MainMenu
 						quit = true;
 					}
 					
-					
-					System.out.println(game.ai.takeTurn());
-					
 					if (game.playerHand.isEmpty())
 					{
-						System.out.println("You win!");
+						System.out.println("You win!\n");
 					}
 					if (game.compHand.isEmpty())
 					{
-						System.out.println("You lose...");
+						System.out.println("You lose...\n");
 					}
 				}
 			}
 			// quit the game
 			else if (option.equalsIgnoreCase("quit"))
 			{
-				System.out.println("Thank you for playing!");
-				play = false;
 				keyboard.close();
+				System.out.print("Thank you for playing!");
+				play = false;
 				System.exit(0);
 			}
 			// if input was invalid
