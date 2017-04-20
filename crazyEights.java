@@ -35,31 +35,72 @@ public class crazyEights extends Game{
         while(!hasPlayed){
             System.out.println("Select a card to play, or type draw to draw the card.\nYour current hand contains " + super.getHand());
             if(eightSuit != null){
-            	System.out.println("The top card on the discard pile is an" + super.getTop().getValue() + " but the suit has been changed to " + eightSuit);
+            	System.out.println("The top card on the discard pile is the " + super.getTop().getValue() + " but the suit has been changed to " + eightSuit);
             }else
             	System.out.println("The top card on the discard pile is " + super.getTop());
-            String s=kb.next().trim();
-            if(s.equalsIgnoreCase("draw"))
+            String s = kb.nextLine().trim();
+            if(s.equalsIgnoreCase("draw")){
                 super.drawToPlayer();
-            else{
-                if(super.getHand().contains(s) && validPlay(playerHand.get(playerHand.indexOf(s)))){
-                	if(s.charAt(0) == '8'){
-                		eight();
-                	}else
-                		eightSuit = null;
-                	super.getDeck().discard(super.getHand().get(super.getHand().indexOf(s)));
-                }
+                System.out.println("You drew " + playerHand.get(playerHand.size()-1));
+            }else{
+            	if(playerHasCard(s)){
+                	if(validPlay(playerHand.get(playerFindCard(s)))){
+                		if(s.charAt(0) == '8')
+                			eight();
+                		else
+                			eightSuit = null;
+                		
+                		System.out.println("test");
+                		super.getDeck().discard(playerHand.get(playerFindCard(s)));
+                		playerHand.remove(playerHand.get(playerFindCard(s)));
+                		hasPlayed = true;
+                		
+                		boolean wantsToPlay = true;
+                		while(wantsToPlay && playerFindValue(super.getDeck().getTopUsed().getValue().toString()) != -1){
+                			if(playerFindValue(super.getDeck().getTopUsed().getValue().toString()) != -1){
+                				boolean valid = false;
+                				while(!valid){
+                					System.out.print("You may play another card of the same value. Would you like to?(Yes/No)");
+                					String yn = kb.nextLine();
+                					if(yn.equalsIgnoreCase("yes")){
+                						System.out.println("Select a card to play.\nYour current hand contains " + super.getHand());
+                						s = kb.nextLine().trim();
+                						if(playerHasCard(s)){
+                		                	if(playerHand.get(playerFindCard(s)).getValue().equals(Game.getDeck().getTopUsed().getValue())){
+                		                		if(s.charAt(0) == '8')
+                		                			eight();
+                		                		else
+                		                			eightSuit = null;
+                		                		
+                		                		System.out.println("test");
+                		                		super.getDeck().discard(playerHand.get(playerFindCard(s)));
+                		                		playerHand.remove(playerHand.get(playerFindCard(s)));
+                		                		valid = true;
+                		                	}
+                						}else
+                							System.out.println("Invalid choice. Please try again.");
+                					}else if(yn.equalsIgnoreCase("no")){
+                						valid = true;
+                						wantsToPlay = false;
+                					}else
+                						System.out.println("Invalid choice. Please try again.");
+                				}
+                			}
+                		}
+                	}
+                }else
+                	System.out.println("Invalid choice. Please try again.");
             }
         }
         return playerHand.isEmpty();
     }
 
     public void eight(){
-    	System.out.print("Select a suit (clubs, spades, diamonds, hearts): ");
-    	String s = kb.next();
-    	while (!s.equals("Clubs") || !s.equals("Spades") || !s.equals("Hearts") || !s.equals("Hiamonds")) {
+    	System.out.print("Select a suit and be case sensitive(Clubs, Spades, Diamonds, Hearts): ");
+    	String s = kb.nextLine();
+    	while (!s.equals("Clubs") && !s.equals("Spades") && !s.equals("Hearts") && !s.equals("Diamonds")) {
     		System.out.print("Select a suit and be case sensitive(Clubs, Spades, Diamonds, Hearts): ");
-    		s = kb.next();
+    		s = kb.nextLine();
     	}
     	eightSuit = s;
     }
@@ -67,4 +108,31 @@ public class crazyEights extends Game{
     public boolean hasWon(ArrayList<Card> h){
     	return h.isEmpty();
     }
+    
+	//returns true if the cpu's hand contains a card that makes the following statement true: (c.toString().equals(s))
+    private boolean playerHasCard(String s){
+		for(Card c: playerHand){
+			if(c.equals(s))
+				return true;
+		}
+		return false;
+	}
+    
+	//loops through the cpu's hand and returns the first index of the card that makes the following statement true: (c.toString().equals(s))
+	private int playerFindCard(String s){
+		for(Card c: playerHand){
+			if(c.equals(s))
+				return playerHand.indexOf(c);
+		}
+		return -1;
+	}
+	
+	//loops through the cpu's hand and returns the first index of a card whose value matches the inputted String
+	private int playerFindValue(String s){
+		for(Card c: playerHand){
+			if(c.getValue().equals(s) && !c.getValue().equals("8"))
+				return playerHand.indexOf(c);
+		}
+		return -1;
+	}
 }
