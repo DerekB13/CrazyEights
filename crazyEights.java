@@ -76,7 +76,6 @@ public class crazyEights extends Game{
                 		                		else
                 		                			eightSuit = null;
                 		                		
-                		                		System.out.println("test");
                 		                		super.getDeck().discard(playerHand.get(playerFindCard(s)));
                 		                		playerHand.remove(playerHand.get(playerFindCard(s)));
                 		                		valid = true;
